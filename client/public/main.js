@@ -10,7 +10,8 @@ let labels = {
 	currency2: "currency2",
 	getConversionRate: "GO",
 	showHistory: "Show historical data",
-	showHistoryButton: "GO"
+	showHistoryButton: "GO",
+	backToHistory: "Go back"
 };
 
 const state = ko.observable("exchange");
@@ -65,6 +66,7 @@ function showCurrencyGraph() {
 
 			let graph = new Rickshaw.Graph({
 				element: document.querySelector("#graph"),
+				renderer: "line",
 				width: 300,
 				height: 300,
 				series: [{
@@ -76,15 +78,23 @@ function showCurrencyGraph() {
 		});
 }
 
+function backToHistory() {
+	state("exchange");
+}
+
 ko.applyBindings({
 	state: state,
 	rate: rate,
+	buttonsEnabled: buttonsEnabled,
+	currencyTypes: currencyTypes,
+
 	currency1: currency1,
 	currency2: currency2,
 	currencyToPlot: currencyToPlot,
+
 	getConversionRate: getConversionRate,
 	showCurrencyGraph: showCurrencyGraph,
-	buttonsEnabled: buttonsEnabled,
-	currencyTypes: currencyTypes,
+	backToHistory: backToHistory,
+
 	labels: labels
 });

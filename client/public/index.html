@@ -27,7 +27,10 @@
 			</div>
 		<!-- /ko -->
 		<!-- ko if: state() === "graph" -->
-			<div id="graph"></div>
+			<div class="plot-page">
+				<div id="graph"></div>
+				<button data-bind="text: labels.backToHistory, click: backToHistory"></button>
+			</div>
 		<!-- /ko -->
 	</body>
 
