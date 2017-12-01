@@ -1,0 +1,18 @@
+html, body {
+	height: 100%;
+	width: 100%;
+}
+
+body {
+	display: flex;
+}
+
+body > div {
+	margin: auto;
+}
+
+.service-unavailable {
+	height: 300px;
+	width: 100%;
+	max-width: 300px;
+}

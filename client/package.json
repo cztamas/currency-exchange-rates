@@ -1,0 +1,15 @@
+{
+  "name": "currency-client",
+  "version": "0.1.0",
+  "description": "",
+  "main": "staticServer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "cztamas",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.2",
+    "knockout": "^3.4.2"
+  }
+}

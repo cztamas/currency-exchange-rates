@@ -1,0 +1,21 @@
+<html>
+	<head>
+  		<link rel="stylesheet" type="text/css" href="./style.css">
+		<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js'></script>
+	</head>
+	<body>
+		<!-- ko if: state() === "error" -->
+			<div class="service-unavailable">
+				<h1 data-bind="text: labels.mainErrorMessage"></h1>
+			</div>
+		<!-- /ko -->
+		<!-- ko if: state() === "exchange" -->
+			<div class="exchange-rates"></div>
+		<!-- /ko -->
+		<!-- ko if: state() === "graph" -->
+			<div class="currency-graphy"></div>
+		<!-- /ko -->
+	</body>
+
+	<script src="./main.js"></script>
+</html>

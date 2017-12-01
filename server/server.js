@@ -12,35 +12,42 @@ const app = express();
 
 // Using a plain JS object for data storage for the sake of simplicity.
 // Of course in production, with larger amounts of data we would use a DB.
-let currentCurrencyData = {};
+let currentData = {
+	history: {},
+	current: {},
+	types: []
+};
 
 app.get("/history/:currency/", (req, res) => {
 	let currency = req.params.currency;
-	let data = currentCurrencyData[currency];
+	let data = currentData.history[currency];
 	if (!data) {
 		return res.status(404).send({
 			error: `Unknown currency code: ${currency}`
 		});
 	}
-	delete data.latest;
 	res.status(200).send(data);
+});
+
+app.get("/list", (req, res) => {
+	res.status(200).send(currentData.types);
 });
 
 app.get("/", (req, res) => {
 	let currency1 = req.query.c1;
 	let currency2 = req.query.c2;
-	if (!currentCurrencyData[currency1]) {
+	if (!currentData.current[currency1]) {
 		return res.status(404).send({
 			error: `Unknown currency code: ${currency1}`
 		});
 	}
-	if (!currentCurrencyData[currency2]) {
+	if (!currentData.current[currency2]) {
 		return res.status(404).send({
 			error: `Unknown currency code: ${currency2}`
 		});
 	}
-	let rate1 = parseFloat(currentCurrencyData[currency1].latest);
-	let rate2 = parseFloat(currentCurrencyData[currency2].latest);
+	let rate1 = parseFloat(currentData.current[currency1]);
+	let rate2 = parseFloat(currentData.current[currency2]);
 	let rate = rate2 / rate1;
 	res.status(200).send({
 		rate: rate
@@ -53,7 +60,12 @@ app.get("/ping", (req, res) => {
 
 function updateCurrencyData(callback) {
 	let xmlData = "";
-	let newCurrencyData = {};
+	let newData = {
+		history: {},
+		current: {},
+		types: []
+	};
+
 	http.get(dataUrl, res => {
 		res.on("data", data => {
 			xmlData += data;
@@ -68,9 +80,9 @@ function updateCurrencyData(callback) {
 
 				latestDataRow.forEach(item => {
 					let data = item.$;
-					newCurrencyData[data.currency] = {
-						latest: data.rate
-					};
+					newData.current[data.currency] = data.rate;
+					newData.types.push(data.currency);
+					newData.history[data.currency] = {};
 				});
 
 				dataRows.forEach(row => {
@@ -78,11 +90,11 @@ function updateCurrencyData(callback) {
 					let items = row.Cube;
 					items.forEach(item => {
 						let data = item.$;
-						newCurrencyData[data.currency][date] = data.rate;
+						newData.history[data.currency][date] = data.rate;
 					});
 				});
 
-				currentCurrencyData = newCurrencyData;
+				currentData = newData;
 				callback();
 			});
 		});
@@ -90,10 +102,12 @@ function updateCurrencyData(callback) {
 	});
 }
 
+// Start the server.
 updateCurrencyData(() => {
 	app.listen(port, console.log(`Server is listening on http://localhost:${port}`));
 });
 
+// Check for updates regularly.
 setInterval(() => {
 	updateCurrencyData(() => {
 		console.log(`Data updated at ${new Date()}`);
