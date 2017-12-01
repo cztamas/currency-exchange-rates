@@ -2,6 +2,8 @@
 	<head>
   		<link rel="stylesheet" type="text/css" href="./style.css">
 		<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js'></script>
+		<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js'></script>
+		<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/rickshaw/1.6.3/rickshaw.min.js'></script>
 	</head>
 	<body>
 		<!-- ko if: state() === "error" -->
@@ -10,10 +12,22 @@
 			</div>
 		<!-- /ko -->
 		<!-- ko if: state() === "exchange" -->
-			<div class="exchange-rates"></div>
+			<div class="exchange-rates">
+				<span data-bind="text: labels.currency1"></span>
+				<select data-bind="options: currencyTypes, value: currency1"></select>
+				<span data-bind="text: labels.currency2"></span>
+				<select data-bind="options: currencyTypes, value: currency2"></select>
+				<button data-bind="click: getConversionRate, text: labels.getConversionRate, enable: buttonsEnabled"></button>
+				<div class="result" data-bind="text: rate"></div>
+			</div>
+			<div class="history">
+				<span data-bind="text: labels.showHistory"></span>
+				<select data-bind="options: currencyTypes, value: currencyToPlot"></select>
+				<button data-bind="text: labels.showHistoryButton, click: showCurrencyGraph, enable: buttonsEnabled"></button>
+			</div>
 		<!-- /ko -->
 		<!-- ko if: state() === "graph" -->
-			<div class="currency-graphy"></div>
+			<div id="graph"></div>
 		<!-- /ko -->
 	</body>
 

@@ -18,6 +18,12 @@ let currentData = {
 	types: []
 };
 
+app.use((req, res, next) => {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	next();
+});
+
 app.get("/history/:currency/", (req, res) => {
 	let currency = req.params.currency;
 	let data = currentData.history[currency];
@@ -82,7 +88,7 @@ function updateCurrencyData(callback) {
 					let data = item.$;
 					newData.current[data.currency] = data.rate;
 					newData.types.push(data.currency);
-					newData.history[data.currency] = {};
+					newData.history[data.currency] = [];
 				});
 
 				dataRows.forEach(row => {
@@ -90,7 +96,7 @@ function updateCurrencyData(callback) {
 					let items = row.Cube;
 					items.forEach(item => {
 						let data = item.$;
-						newData.history[data.currency][date] = data.rate;
+						newData.history[data.currency].push({ date: date, rate: data.rate });
 					});
 				});
 
