@@ -4,18 +4,20 @@ const ko = window.ko;
 const Rickshaw = window.Rickshaw;
 const serverPort = 9871;
 const maxRetryCount = 5; // Number of consecutive retries if cannot connect to the server.
+const ratePrecision = 5;
 
 let labels = {
 	errors: {
 		mainMessage: "Service temporarily unavailable. We are sorry.",
 		message: "An error happened while loading your data. We are sorry."
 	},
-	currency1: "Convert 1 ",
+	currency1: "Convert ",
 	currency2: "to",
 	getConversionRate: "GO",
-	showHistory: "Show historical exchange rate data",
+	showHistory: "Show currency history:",
 	showHistoryButton: "GO",
-	backToHistory: "Go back"
+	backToHistory: "Back to main page",
+	plotHistory: "Plot exchange rate history:"
 };
 
 const state = ko.observable("exchange");
@@ -24,9 +26,11 @@ const currency2 = ko.observable(null);
 const currencyToPlot = ko.observable(null);
 const buttonsEnabled = ko.observable(false);
 const currencyTypes = ko.observable([]);
+const graphTitle = ko.observable(null);
 const rate = ko.observable(null);
+const quantity = ko.observable(1);
 const rateResult = ko.computed(function() {
-	return `1.00 ${currency1()} = ${rate()} ${currency2()}`;
+	return `${quantity()} ${currency1()} = <span class="result">${rate()}</span> ${currency2()}`;
 });
 const rateResultVisible = ko.observable(false);
 const errorsVisible = {
@@ -39,7 +43,9 @@ const errorsVisible = {
 ko.computed(function() {
 	currency1();
 	currency2();
+	quantity();
 	rateResultVisible(false);
+	errorsVisible.exchange(false);
 });
 
 let retryCount = 0;
@@ -68,6 +74,8 @@ function loadCurrencyTypes() {
 
 function getConversionRate() {
 	errorsVisible.exchange(false);
+	let currentQuantity = parseFloat(quantity()) || 1;
+	quantity(currentQuantity);
 	if (!currency1() || !currency2()) {
 		return;
 	}
@@ -78,7 +86,7 @@ function getConversionRate() {
 		.then(res => res.json())
 		.then(res => {
 			console.log(res);
-			rate(res.rate);
+			rate((res.rate * quantity()).toPrecision(ratePrecision));
 			rateResultVisible(true);
 		})
 		.catch(err => {
@@ -99,6 +107,9 @@ function showCurrencyGraph() {
 		.then(res => res.json())
 		.then(json => json.map(item => ({ x: new Date(item.date).getTime() / 1000, y: parseFloat(item.rate) }) ))
 		.then(renderGraph)
+		.then(() => {
+			graphTitle(`EUR to ${currencyToPlot()} exchange rates`);
+		})
 		.catch(err => {
 			errorsVisible.graph(true);
 			console.log(err);
@@ -110,7 +121,13 @@ function renderGraph(data) {
 	state(null);
 	state("graph");
 	let graphHolder = document.getElementById("graph");
-	let y_min = Math.min(...data.map(point => point.y));
+	let yValues = data.map(point => point.y);
+	let y_min = Math.min(...yValues);
+	let y_max = Math.max(...yValues);
+
+	// Calculate the necessary precision - the built-in methods in Rickshaw produced ugly results sometimes.
+	// Math.log(0) = -Infinity, so the code is OK.
+	let precision = Math.max(3, Math.ceil(Math.log(y_max - y_min) / Math.log(10)));
 
 	let graph = new Rickshaw.Graph({
 		element: graphHolder,
@@ -128,7 +145,7 @@ function renderGraph(data) {
 	let y_axis = new Rickshaw.Graph.Axis.Y( {
         graph: graph,
         orientation: "left",
-        tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+        tickFormat: y => y.toPrecision(precision),
         element: document.getElementById("graph-y-axis"),
 	} );
 
@@ -162,6 +179,7 @@ ko.applyBindings({
 	currency1: currency1,
 	currency2: currency2,
 	currencyToPlot: currencyToPlot,
+	quantity: quantity,
 
 	getConversionRate: getConversionRate,
 	showCurrencyGraph: showCurrencyGraph,

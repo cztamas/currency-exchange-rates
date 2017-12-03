@@ -9,35 +9,46 @@
 	<body>
 		<!-- ko if: errorsVisible.main -->
 			<div class="service-unavailable">
-				<h1 data-bind="text: labels.errors.mainMessage"></h1>
+				<h1 class="error-message" data-bind="text: labels.errors.mainMessage"></h1>
 			</div>
 		<!-- /ko -->
 		<!-- ko if: state() === "exchange" -->
-			<div class="exchange-rates">
-				<span data-bind="text: labels.currency1"></span>
-				<select data-bind="options: currencyTypes, value: currency1"></select>
-				<span data-bind="text: labels.currency2"></span>
-				<select data-bind="options: currencyTypes, value: currency2"></select>
-				<button data-bind="click: getConversionRate, text: labels.getConversionRate, enable: buttonsEnabled"></button>
-				<div class="result" data-bind="text: rateResult, visible: rateResultVisible"></div>
-				<div class="error-message" data-bind="text: labels.errors.message, visible: errorsVisible.exchange"></div>
-			</div>
-			<div class="history">
-				<span data-bind="text: labels.showHistory"></span>
-				<select data-bind="options: currencyTypes, value: currencyToPlot"></select>
-				<button data-bind="text: labels.showHistoryButton, click: showCurrencyGraph, enable: buttonsEnabled"></button>
+			<div class="exchange-page">
+				<div class="exchange-rates">
+					<div class="exchange-rates-handler">
+						<span data-bind="text: labels.currency1"></span>
+						<input type="text" data-bind="textInput: quantity">
+						<select data-bind="options: currencyTypes, value: currency1"></select>
+						<span data-bind="text: labels.currency2"></span>
+						<select data-bind="options: currencyTypes, value: currency2"></select>
+						<button data-bind="click: getConversionRate, text: labels.getConversionRate, enable: buttonsEnabled"></button>
+					</div>
+					<div data-bind="html: rateResult, visible: rateResultVisible"></div>
+					<div class="error-message" data-bind="text: labels.errors.message, visible: errorsVisible.exchange"></div>
+				</div>
+				<div class="history">
+					<span data-bind="text: labels.showHistory"></span>
+					<select data-bind="options: currencyTypes, value: currencyToPlot"></select>
+					<button data-bind="text: labels.showHistoryButton, click: showCurrencyGraph, enable: buttonsEnabled"></button>
+				</div>
 			</div>
 		<!-- /ko -->
 		<!-- ko if: state() === "graph" -->
 			<div class="plot-page">
-				<div class="plot" data-bind="ifnot: errorsVisible.graph">
-					<div id="graph-y-axis"></div>
-					<div id="graph"></div>
-				</div>
+				<div class="title" data-bind="text: graphTitle"></div>
+				<!-- ko ifnot: errorsVisible.graph -->
+					<div class="plot">
+						<div id="graph-y-axis"></div>
+						<div id="graph"></div>
+					</div>
+				<!-- /ko -->
 				<div class="error-message" data-bind="text: labels.errors.message, visible: errorsVisible.graph"></div>
+				<div class="options">
+					<span data-bind="text: labels.plotHistory"></span>
+					<select data-bind="options: currencyTypes, value: currencyToPlot"></select>
+					<button data-bind="text: labels.showHistoryButton, click: showCurrencyGraph, enable: buttonsEnabled"></button>
+				</div>
 				<button data-bind="text: labels.backToHistory, click: backToHistory"></button>
-				<select data-bind="options: currencyTypes, value: currencyToPlot"></select>
-				<button data-bind="text: labels.showHistoryButton, click: showCurrencyGraph, enable: buttonsEnabled"></button>
 			</div>
 		<!-- /ko -->
 	</body>
