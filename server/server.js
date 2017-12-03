@@ -7,6 +7,7 @@ const parser = require("xml2js");
 const dataUrl = "http://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml";
 const port = 9871;
 const updateTimeout = 3600 * 1000; // Check for updates hourly.
+const ratePrecision = 6; // The number of significant digits in the exchange rates.
 
 const app = express();
 
@@ -56,7 +57,7 @@ app.get("/", (req, res) => {
 	let rate2 = parseFloat(currentData.current[currency2]);
 	let rate = rate2 / rate1;
 	res.status(200).send({
-		rate: rate
+		rate: rate.toPrecision(ratePrecision)
 	});
 });
 
@@ -96,7 +97,7 @@ function updateCurrencyData(callback) {
 					let items = row.Cube;
 					items.forEach(item => {
 						let data = item.$;
-						newData.history[data.currency].push({ date: date, rate: data.rate });
+						newData.history[data.currency].unshift({ date: date, rate: data.rate });
 					});
 				});
 

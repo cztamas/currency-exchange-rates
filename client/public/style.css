@@ -11,6 +11,37 @@ body > div {
 	margin: auto;
 }
 
+.plot-page {
+	width: 90vw;
+	height: 90vh;
+}
+
+.plot {
+	width: 100%;
+	height: 80%;
+	position: relative;
+}
+
+#graph-y-axis {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: 50px;
+}
+
+.detail .x_label {
+	display: none
+}
+
+#graph {
+	background-color: lightgrey;
+	position: relative;
+	left: 50px;
+	right: 0;
+	height: 100%;
+}
+
 .service-unavailable {
 	height: 300px;
 	width: 100%;
