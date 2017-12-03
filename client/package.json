@@ -1,5 +1,5 @@
 {
-  "name": "currency-client",
+  "name": "currency-exchange-client",
   "version": "0.1.0",
   "description": "",
   "main": "staticServer.js",
@@ -9,7 +9,6 @@
   "author": "cztamas",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.16.2",
-    "knockout": "^3.4.2"
+    "express": "^4.16.2"
   }
 }
